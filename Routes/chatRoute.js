@@ -1,26 +1,29 @@
-// const express = require("express");
-// const router = express.Router();
+import express from "express";
+import Groq from "groq-sdk";
 
-// // Example: send message
-// router.post("/", (req, res) => {
-//   const { message } = req.body;
-//   res.json({ reply:`You said:${message}` });  // 👈 now matches frontend
-// });
-// // Example: get all messages (optional)
-// router.get("/", (req, res) => {
-//   res.json({ success: true, messages: ["Hello", "Hi there!"] });
-// });
-
-// module.exports = router;
-
-//console.log("📌 chatRoute.js loaded");
-
-const express = require("express");
 const router = express.Router();
-const { askAI } = require("../controllers/Aichatcontroller.js"); // import controller
 
-// POST: delegate to controller
-router.post("/", askAI);
-//});
+router.post("/", async (req, res) => {
+  try {
+    const groq = new Groq({
+      apiKey: process.env.GROQ_API_KEY,
+    });
 
-module.exports = router;
+    const { message } = req.body;
+
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      messages: [
+        { role: "system", content: "You are a helpful educational assistant." },
+        { role: "user", content: message },
+      ],
+    });
+
+    res.json({ reply: completion.choices[0].message.content });
+  } catch (error) {
+    console.error("Groq Error:", error.message);
+    res.status(500).json({ reply: "Groq API error" });
+  }
+});
+
+export default router;

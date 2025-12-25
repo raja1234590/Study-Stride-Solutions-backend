@@ -3,14 +3,14 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/usermodel");
 
-// ✅ Generate JWT
+
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 };
 
-// ✅ Signup
+
 exports.signup = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -43,7 +43,7 @@ exports.signup = async (req, res) => {
   }
 };
 
-// ✅ Login
+
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -74,7 +74,6 @@ exports.login = async (req, res) => {
   }
 };
 
-// ✅ Logout
 exports.logout = async (req, res) => {
   try {
     res.status(200).json({ message: "Logout successful" });
@@ -83,7 +82,7 @@ exports.logout = async (req, res) => {
   }
 };
 
-// ✅ Forgot Password (Simplified: just enter email + new password)
+
 exports.forgotPassword = async (req, res) => {
   try {
     const { email, newPassword } = req.body;
@@ -97,7 +96,7 @@ exports.forgotPassword = async (req, res) => {
       return res.status(400).json({ message: "User not found" });
     }
 
-    // Hash and update new password
+   
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
     await user.save();
@@ -108,7 +107,6 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-// ✅ Reset Password (optional — if you want token-based later)
 exports.resetPassword = async (req, res) => {
   res.status(400).json({
     message: "Reset password via token not implemented in simplified flow",
